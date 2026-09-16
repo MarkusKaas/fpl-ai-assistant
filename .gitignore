@@ -1,0 +1,24 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+
+## SQLite runtime database (generated on first run, not source)
+*.db
+*.db-shm
+*.db-wal
+
+## Local secrets — never commit real keys, use dotnet user-secrets or env vars
+appsettings.Local.json
+**/appsettings.Development.json
+
+## IDE
+.vs/
+.vscode/
+*.swp
+.idea/
+
+## OS
+.DS_Store
+Thumbs.db

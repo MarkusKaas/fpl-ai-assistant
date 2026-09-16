@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        run: dotnet restore FplAiAssistant.sln
+
+      - name: Build
+        run: dotnet build FplAiAssistant.sln --no-restore --configuration Release
+
+      - name: Test
+        # No Azure OpenAI credentials are configured in CI, so the app runs
+        # against the free offline advice generator — the whole test suite
+        # (and the app itself) works with zero secrets.
+        run: dotnet test FplAiAssistant.sln --no-build --configuration Release --verbosity normal
