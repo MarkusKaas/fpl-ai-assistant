@@ -45,7 +45,7 @@ public class PlayerRetrievalServiceTests
         var pool = new List<Player>
         {
             MakePlayer(1, "HighTotalLowForm", Position.Midfielder, 8.0m, 200, 2.0m, 15m),
-            MakePlayer(2, "LowTotalHighForm", Position.Midfielder, 6.0m, 60, 9.0m, 15m),
+            MakePlayer(2, "LowTotalHighForm", Position.Midfielder, 6.0m, 60, 9.5m, 15m),
         };
 
         var result = _sut.Retrieve("who should I captain this week?", pool);
