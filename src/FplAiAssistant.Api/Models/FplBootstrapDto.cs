@@ -18,6 +18,25 @@ public class FplBootstrapDto
 
     [JsonPropertyName("element_types")]
     public List<FplElementTypeDto> ElementTypes { get; set; } = new();
+
+    [JsonPropertyName("events")]
+    public List<FplEventDto> Events { get; set; } = new();
+}
+
+/// <summary>A single FPL gameweek ("event"), used to work out what "current" means.</summary>
+public class FplEventDto
+{
+    [JsonPropertyName("id")]
+    public int Id { get; set; }
+
+    [JsonPropertyName("finished")]
+    public bool Finished { get; set; }
+
+    [JsonPropertyName("is_current")]
+    public bool IsCurrent { get; set; }
+
+    [JsonPropertyName("is_next")]
+    public bool IsNext { get; set; }
 }
 
 public class FplTeamDto
@@ -30,6 +49,10 @@ public class FplTeamDto
 
     [JsonPropertyName("short_name")]
     public string ShortName { get; set; } = string.Empty;
+
+    /// <summary>The club's crest code, used to build a badge image URL — distinct from <see cref="Id"/>.</summary>
+    [JsonPropertyName("code")]
+    public int Code { get; set; }
 }
 
 public class FplElementTypeDto
