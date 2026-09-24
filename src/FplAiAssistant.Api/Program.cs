@@ -19,6 +19,37 @@ builder.Services.AddHttpClient<IFplDataService, FplDataService>(client =>
 // --- Retrieval (pure logic, no external dependencies) ---
 builder.Services.AddScoped<IPlayerRetrievalService, PlayerRetrievalService>();
 
+// --- Team dashboard: a manager's live squad, next-fixture difficulty, and
+//     transfer/captain suggestions. Pulls from the same public FPL API as the
+//     data ingestion above, just different endpoints (entry, picks, fixtures). ---
+builder.Services.AddMemoryCache();
+builder.Services.AddHttpClient<IFplGameweekService, FplGameweekService>(client =>
+{
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("FplAiAssistant/1.0 (portfolio project)");
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+builder.Services.AddHttpClient<IFplFixtureService, FplFixtureService>(client =>
+{
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("FplAiAssistant/1.0 (portfolio project)");
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+builder.Services.AddHttpClient<IFplTeamService, FplTeamService>(client =>
+{
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("FplAiAssistant/1.0 (portfolio project)");
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+builder.Services.AddScoped<ISquadAnalysisService, SquadAnalysisService>();
+
+// --- League comparison: standings for a classic mini-league plus the same
+//     squad-value/bank/captain signals as the single-team dashboard, so a
+//     group of friends can see not just who's ahead but why. ---
+builder.Services.AddHttpClient<IFplLeagueService, FplLeagueService>(client =>
+{
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("FplAiAssistant/1.0 (portfolio project)");
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+builder.Services.AddScoped<ILeagueAnalysisService, LeagueAnalysisService>();
+
 // --- Advice generation: use Azure OpenAI only if it's actually configured,
 //     otherwise fall back to the free offline generator. This means the app
 //     (and CI) always runs end-to-end with zero setup, and upgrades to real
@@ -46,6 +77,12 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+// --- Web dashboard (wwwroot/index.html + app.js) — a small static UI on top
+//     of the API below. No build step: plain HTML/CSS/JS, fetch()ed straight
+//     from the endpoints this file maps. ---
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.MapGet("/api/health", () => Results.Ok(new
 {
     status = "ok",
@@ -56,6 +93,8 @@ app.MapGet("/api/health", () => Results.Ok(new
 app.MapGroup("/api/data").MapDataEndpoints();
 app.MapGroup("/api/players").MapPlayerEndpoints();
 app.MapGroup("/api/advice").MapAdviceEndpoints();
+app.MapGroup("/api/team").MapTeamEndpoints();
+app.MapGroup("/api/league").MapLeagueEndpoints();
 
 // Ensure the SQLite schema exists. A real production app would use EF Core
 // migrations (`dotnet ef migrations add ...`) instead — EnsureCreated is the
