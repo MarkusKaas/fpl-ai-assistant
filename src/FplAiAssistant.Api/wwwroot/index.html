@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FPL AI Assistant</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-mark">FPL</span>
+        <div>
+          <h1>FPL AI Assistant</h1>
+          <p class="subtitle">Your squad, next-fixture difficulty, and transfer suggestions — in one place.</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="controls card">
+      <div class="controls-row">
+        <label for="team-id">FPL Team ID</label>
+        <input id="team-id" type="number" min="1" placeholder="e.g. 153502" />
+        <button id="load-team-btn" class="btn btn-primary">Load my team</button>
+        <button id="refresh-data-btn" class="btn btn-ghost">Refresh player data</button>
+      </div>
+      <p class="hint">
+        Find your team ID in your FPL team URL: <code>fantasy.premierleague.com/entry/<strong>&lt;id&gt;</strong>/...</code>
+      </p>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section id="dashboard" class="dashboard hidden">
+      <section class="summary-grid" id="summary-grid"></section>
+
+      <section class="card highlight-card" id="captain-card">
+        <h2>Suggested Captain</h2>
+        <div id="captain-content"></div>
+      </section>
+
+      <section class="card" id="transfers-card">
+        <h2>Transfer Suggestions</h2>
+        <div id="transfers-content"></div>
+      </section>
+
+      <section class="card" id="squad-card">
+        <h2>Your Squad</h2>
+        <h3 class="squad-subheading">Starting XI</h3>
+        <div id="starting-grid" class="player-grid"></div>
+        <h3 class="squad-subheading">Bench</h3>
+        <div id="bench-grid" class="player-grid"></div>
+      </section>
+
+      <section class="card highlight-card" id="lineup-card">
+        <h2>Suggested Line-up <span id="lineup-formation" class="formation-badge"></span></h2>
+        <div id="lineup-changes"></div>
+        <h3 class="squad-subheading">Starting XI</h3>
+        <div id="lineup-starting-grid" class="player-grid"></div>
+        <h3 class="squad-subheading">Bench</h3>
+        <div id="lineup-bench-grid" class="player-grid"></div>
+      </section>
+
+      <section class="card" id="history-card">
+        <h2>Your Season So Far</h2>
+        <h3 class="squad-subheading">Points per gameweek</h3>
+        <div id="history-points-chart" class="chart"></div>
+        <h3 class="squad-subheading">Overall rank over time</h3>
+        <div id="history-rank-chart" class="chart"></div>
+      </section>
+    </section>
+
+    <section id="league-section" class="league-section">
+      <section class="card">
+        <h2>Compare with a League</h2>
+        <div class="controls-row">
+          <label for="league-id">FPL League ID</label>
+          <input id="league-id" type="number" min="1" placeholder="e.g. 275094" />
+          <button id="load-league-btn" class="btn btn-primary">Load league</button>
+        </div>
+        <p class="hint">
+          Find your league ID in its URL: <code>fantasy.premierleague.com/leagues/<strong>&lt;id&gt;</strong>/standings/c</code>
+        </p>
+        <p id="league-status" class="status" role="status" aria-live="polite"></p>
+      </section>
+
+      <section id="league-dashboard" class="hidden">
+        <section class="card highlight-card" id="league-highlights-card">
+          <h2 id="league-name">League</h2>
+          <div id="league-highlights" class="summary-grid"></div>
+        </section>
+
+        <section class="card" id="league-table-card">
+          <h2>Standings</h2>
+          <div id="league-table-wrap">
+            <table id="league-table" class="league-table">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Manager</th>
+                  <th>Team</th>
+                  <th>GW</th>
+                  <th>Total</th>
+                  <th>Squad value</th>
+                  <th>Bank</th>
+                  <th>Captain</th>
+                </tr>
+              </thead>
+              <tbody id="league-table-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card" id="league-history-card">
+          <h2>Total Points Over the Season, Across the League</h2>
+          <div id="league-history-chart" class="chart chart-wide"></div>
+          <div id="league-history-legend" class="chart-legend"></div>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <footer>
+    <p>Built by Markus Holm Kaas &middot; data from the official, public Fantasy Premier League API.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
