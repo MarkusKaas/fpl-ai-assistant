@@ -17,9 +17,10 @@ public static class AdviceEndpoints
             CancellationToken ct) =>
         {
             if (string.IsNullOrWhiteSpace(request.Question))
-            {
                 return Results.BadRequest(new { error = "Question must not be empty." });
-            }
+
+            if (request.Question.Length > 500)
+                return Results.BadRequest(new { error = "Question must be 500 characters or fewer." });
 
             var pool = await db.Players.Include(p => p.Team).ToListAsync(ct);
             if (pool.Count == 0)
