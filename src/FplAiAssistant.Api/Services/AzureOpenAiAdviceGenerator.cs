@@ -33,8 +33,13 @@ public class AzureOpenAiAdviceGenerator : IAdviceGenerator
         _chatClient = azureClient.GetChatClient(deploymentName);
     }
 
+    private const int MaxQuestionLength = 500; // Prevent runaway token usage from very long inputs
+
     public async Task<string> GenerateAsync(string question, IReadOnlyList<PlayerSummary> context, CancellationToken cancellationToken = default)
     {
+        if (question.Length > MaxQuestionLength)
+            question = question[..MaxQuestionLength];
+
         var systemPrompt =
             "You are a concise Fantasy Premier League assistant. Base your answer strictly " +
             "on the player data provided below — do not invent stats, and do not rely on your " +
