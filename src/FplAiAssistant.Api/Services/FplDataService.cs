@@ -41,17 +41,19 @@ public class FplDataService : IFplDataService
             et => et.Id,
             et => MapPosition(et.SingularNameShort));
 
-        // Wipe and reload. Simple, correct, and fast enough for a dataset this size.
-        _db.Players.RemoveRange(_db.Players);
-        _db.Teams.RemoveRange(_db.Teams);
-        await _db.SaveChangesAsync(cancellationToken);
-
+        // Fetch succeeds first — only then wipe the DB. This prevents losing all
+        // data on a transient FPL API error (the old order deleted before fetching).
         var teams = bootstrap.Teams.Select(t => new Team
         {
             Id = t.Id,
             Name = t.Name,
             ShortName = t.ShortName,
         }).ToList();
+
+        _db.Players.RemoveRange(_db.Players);
+        _db.Teams.RemoveRange(_db.Teams);
+        await _db.SaveChangesAsync(cancellationToken);
+
         await _db.Teams.AddRangeAsync(teams, cancellationToken);
 
         var now = DateTimeOffset.UtcNow;
