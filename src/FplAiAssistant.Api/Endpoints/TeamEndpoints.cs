@@ -48,7 +48,8 @@ public static class TeamEndpoints
             var nextGameweek = await gameweekService.GetNextGameweekAsync(ct);
             var fixturesByTeam = await fixtureService.GetUpcomingFixturesByTeamAsync(nextGameweek, count: 3, cancellationToken: ct);
 
-            var squadPlayers = pool.Where(p => picks.Any(pick => pick.Element == p.Id)).ToList();
+            var pickIds = new HashSet<int>(picks.Select(pick => pick.Element));
+            var squadPlayers = pool.Where(p => pickIds.Contains(p.Id)).ToList();
 
             var dashboard = analysisService.BuildDashboard(entryInfo, gameweek, picks, squadPlayers, pool, fixturesByTeam);
 
