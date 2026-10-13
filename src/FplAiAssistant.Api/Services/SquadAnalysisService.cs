@@ -10,6 +10,11 @@ namespace FplAiAssistant.Api.Services;
 /// </summary>
 public class SquadAnalysisService : ISquadAnalysisService
 {
+    // Named constants for PlayScore weights — change here to tune the scoring model globally.
+    private const decimal FormWeight       = 2m;   // Multiplier for recent form (recency bias is intentional)
+    private const decimal PointsScale      = 10m;  // Divisor to bring season points onto the same scale as form
+    private const int     MinMinutesPlayed = 90;   // Skip players who haven't started at least one full game
+
     /// <summary>The 8 (Def, Mid, Fwd) shapes that are legal for an FPL starting XI (plus 1 GK = 11).</summary>
     private static readonly (int Def, int Mid, int Fwd)[] ValidFormations =
     {
@@ -67,7 +72,7 @@ public class SquadAnalysisService : ISquadAnalysisService
                 .Where(p => !squadIds.Contains(p.Id))
                 .Where(p => p.Position.ToString() == weak.Position)
                 .Where(p => p.Price <= budget)
-                .Where(p => p.MinutesPlayed >= 90) // skip fringe players who barely feature
+                .Where(p => p.MinutesPlayed >= MinMinutesPlayed) // skip fringe players who barely feature
                 .Select(p => ToView(p, fixturesByTeam.GetValueOrDefault(p.TeamId, new List<FixturePreview>()), false, false, false))
                 .OrderByDescending(PlayScore)
                 .FirstOrDefault();
@@ -202,7 +207,7 @@ public class SquadAnalysisService : ISquadAnalysisService
     /// score so easier fixtures push the score up).
     /// </summary>
     private static decimal PlayScore(SquadPlayerView v) =>
-        (v.Form * 2m) + (v.TotalPoints / 10m) + v.FixtureScore;
+        (v.Form * FormWeight) + (v.TotalPoints / PointsScale) + v.FixtureScore;
 
     private static SquadPlayerView ToView(Player p, List<FixturePreview> fixtures, bool isStarting, bool isCaptain, bool isViceCaptain)
     {
