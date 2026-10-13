@@ -4,6 +4,8 @@ namespace FplAiAssistant.Api.Services;
 
 public class PlayerRetrievalService : IPlayerRetrievalService
 {
+    private const decimal BudgetMaxPrice = 6.0m; // Upper price limit for "budget/cheap/value" queries
+
     public IReadOnlyList<PlayerSummary> Retrieve(string question, IReadOnlyList<Player> pool, int take = 8)
     {
         ArgumentNullException.ThrowIfNull(pool);
@@ -30,7 +32,7 @@ public class PlayerRetrievalService : IPlayerRetrievalService
         var wantsBudget = normalized.Contains("budget") || normalized.Contains("cheap") || normalized.Contains("value");
         if (wantsBudget)
         {
-            candidates = candidates.Where(p => p.Price <= 6.0m);
+            candidates = candidates.Where(p => p.Price <= BudgetMaxPrice);
         }
 
         // 4. Rank by a simple blended score: recent form weighted a bit higher
