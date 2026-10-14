@@ -722,6 +722,72 @@ function renderLeagueHistoryChart(container, legend, series) {
   });
 }
 
+// --- AI Advice -----------------------------------------------------------
+
+const adviceInput  = document.getElementById("advice-input");
+const adviceBtn    = document.getElementById("advice-btn");
+const adviceStatus = document.getElementById("advice-status");
+const adviceAnswer = document.getElementById("advice-answer");
+
+function setAdviceQuestion(btn) {
+  adviceInput.value = btn.textContent;
+  adviceInput.focus();
+}
+
+async function askAdvice() {
+  const question = adviceInput.value.trim();
+  if (!question) {
+    adviceStatus.textContent = "Enter a question first.";
+    adviceStatus.className = "status error";
+    return;
+  }
+
+  adviceBtn.disabled = true;
+  adviceStatus.textContent = "Thinking…";
+  adviceStatus.className = "status";
+  adviceAnswer.classList.add("hidden");
+
+  try {
+    const res = await fetch("/api/advice", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question }),
+    });
+    const body = await res.json();
+
+    if (!res.ok) {
+      throw new Error(body?.error || `Request failed (${res.status})`);
+    }
+
+    adviceAnswer.innerHTML = "";
+    const answerText = document.createElement("p");
+    answerText.style.margin = "0";
+    answerText.textContent = body.answer;
+    adviceAnswer.appendChild(answerText);
+
+    if (body.consideredPlayers && body.consideredPlayers.length > 0) {
+      const note = document.createElement("p");
+      note.className = "considered-players";
+      note.textContent = "Based on: " + body.consideredPlayers.map(p => `${p.name} (${p.team})`).join(", ");
+      adviceAnswer.appendChild(note);
+    }
+
+    adviceAnswer.classList.remove("hidden");
+    adviceStatus.textContent = "";
+    adviceStatus.className = "status";
+  } catch (err) {
+    adviceStatus.textContent = err.message;
+    adviceStatus.className = "status error";
+  } finally {
+    adviceBtn.disabled = false;
+  }
+}
+
+adviceBtn.addEventListener("click", askAdvice);
+adviceInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") askAdvice();
+});
+
 loadTeamBtn.addEventListener("click", loadTeam);
 refreshDataBtn.addEventListener("click", refreshPlayerData);
 teamIdInput.addEventListener("keydown", (e) => {
