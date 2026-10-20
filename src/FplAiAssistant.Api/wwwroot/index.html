@@ -72,6 +72,23 @@
       </section>
     </section>
 
+    <section id="advice-section" class="card advice-card">
+      <h2>Ask the AI</h2>
+      <p class="hint">Ask anything about your squad, transfers, or the FPL market. The AI answers based on live player data — not its training data.</p>
+      <div class="advice-examples">
+        <span class="advice-example-label">Try:</span>
+        <button class="advice-chip" onclick="setAdviceQuestion(this)">Who should I captain this week?</button>
+        <button class="advice-chip" onclick="setAdviceQuestion(this)">Best budget midfielder under £6m?</button>
+        <button class="advice-chip" onclick="setAdviceQuestion(this)">Who is the best differential forward?</button>
+      </div>
+      <div class="advice-input-row">
+        <input id="advice-input" type="text" placeholder="e.g. Who should I transfer in this week?" maxlength="500" />
+        <button id="advice-btn" class="btn btn-primary">Ask</button>
+      </div>
+      <p id="advice-status" class="status" role="status" aria-live="polite"></p>
+      <div id="advice-answer" class="advice-answer hidden"></div>
+    </section>
+
     <section id="league-section" class="league-section">
       <section class="card">
         <h2>Compare with a League</h2>
